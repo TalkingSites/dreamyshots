@@ -1,11 +1,9 @@
 {
-  "title": "Space Club!",
-  "description": "Space Club! is our way of putting content for this web template. Check out the pages, posts, events and search. Whats it built with? Great question, it is 11ty, Nunjucks",
+  "name": "Dreamy Shots",
+  "title": "Dreamy Shots",
+  "url": "https://shots.dreamy.org",
+  "bookingUrl": "https://bookdreamyshots.talkingsites.org",
+  "description": "Event photography that captures the feeling of being there.",
   "logo": "/assets/images/logo.svg",
-  "favicon": "/assets/images/favicon.svg",
-  "baseUrl": "/",
-  "timezone": "Australia/Sydney",
-  "dateFormat": "dddd, Do MMMM YYYY",
-  "searchTitle": "Search",
-  "searchPlaceholder": "Search events, posts and pages..."
+  "favicon": "/assets/images/favicon.svg"
 }

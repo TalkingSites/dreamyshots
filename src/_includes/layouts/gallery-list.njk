@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<script>
+try{document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('ds-theme')||'dark');}catch(e){}
+</script>
+<title>Portfolio | {{ site.name }}</title>
+<meta name="description" content="{{ description | default(site.description) }}"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+<link href="/assets/css/styles.css" rel="stylesheet"/>
+<link rel="icon" href="{{ site.favicon }}" type="image/x-icon"/>
+</head>
+<body>
+
+{% include "partials/navbar.njk" %}
+
+<main class="ds-gallery-list-page" data-pagefind-body>
+
+  <div class="ds-gallery-list-header">
+    <h1 class="ds-gallery-list-title">Portfolio</h1>
+    <p class="ds-gallery-list-intro">Every shoot, every frame worth keeping.</p>
+  </div>
+
+  {% if collections.gallery and collections.gallery | length > 0 %}
+
+    {% for item in collections.gallery %}
+    {% set dirPath = "assets/images/gallery/" + item.data.gallery %}
+    {% set allImages = galleries.scan(dirPath) %}
+    {% set previewImages = allImages | limit(12) %}
+
+    <section class="ds-gallery-event-section">
+      <div class="ds-gallery-event-info">
+        <div>
+          <h2 class="ds-gallery-event-name">{{ item.data.title }}</h2>
+          {% if item.data.description %}
+          <p class="ds-gallery-event-blurb">{{ item.data.description }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="ds-gallery-preview-grid">
+        {% if previewImages and previewImages | length > 0 %}
+          {% for img in previewImages %}
+          <a href="{{ item.url }}" class="ds-gallery-preview-thumb"
+             aria-label="View {{ item.data.title }}">
+            <img src="/{{ dirPath }}/{{ img }}"
+                 alt="{{ item.data.title }}"
+                 loading="lazy"/>
+          </a>
+          {% endfor %}
+        {% else %}
+          <div class="ds-gallery-no-images">
+            Photos coming soon
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="ds-gallery-event-footer">
+        <a href="{{ item.url }}" class="ds-gallery-view-all">
+          View full gallery
+          <i class="bi bi-arrow-right" aria-hidden="true"></i>
+        </a>
+        {% if allImages | length > 0 %}
+        <span class="ds-gallery-count">{{ allImages | length }} photo{% if allImages | length != 1 %}s{% endif %}</span>
+        {% endif %}
+      </div>
+    </section>
+    {% endfor %}
+
+  {% else %}
+    <div style="padding:4rem 2.5rem;color:var(--ds-text-faint);font-size:0.9rem;
+                letter-spacing:0.04em;">
+      Portfolio coming soon. Check back after the next shoot.
+    </div>
+  {% endif %}
+
+</main>
+
+{% include "partials/footer.njk" %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/search.js" defer></script>
+<script src="/assets/js/app.js" defer></script>
+</body>
+</html>

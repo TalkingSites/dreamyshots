@@ -1,38 +1,24 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title data-pagefind-meta="title[content]" data-pagefind-index="true">
-{{ title | default(site.title) }}
-</title>
-<meta name="title" content="{{ title | default(site.title) }}" data-pagefind-meta="title[content]" data-pagefind-index="true"/>
-<meta name="description" content="{{ description | default(site.description) }}" data-pagefind-meta="description[content]"/>
+<script>
+try{document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('ds-theme')||'dark');}catch(e){}
+</script>
+<title>{{ title | default(site.name) }} | {{ site.name }}</title>
+<meta name="description" content="{{ description | default(site.description) }}"/>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
 <link href="/assets/css/styles.css" rel="stylesheet"/>
 <link rel="icon" href="{{ site.favicon }}" type="image/x-icon"/>
 </head>
-<body class="bg-body">
-<div>
+<body>
 {% include "partials/navbar.njk" %}
-<div data-pagefind-body>
-<span class="visually-hidden">
-{{ title | default(site.title) }}
-{{ description |
-default(site.description) }}
-{% if not description %}
-— {{ content |
-striptags | replace("\n", " ") | truncate(240, true, "") }}
-{% endif %}
-</span>
-</div>
-<main class="py-3 py-md-5">
-<div class="container">{{ content | safe }}</div>
-</main>
-</div>
+<main style="flex:1;" data-pagefind-body>{{ content | safe }}</main>
 {% include "partials/footer.njk" %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/assets/js/search.js" defer></script>
+<script src="/assets/js/app.js" defer></script>
 </body>
 </html>

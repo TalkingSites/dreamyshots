@@ -1,61 +1,74 @@
-<nav class="navbar shadow-sm sticky-top bg-body" id="navbar-main">
-<div class="container">
-<a class="navbar-brand d-flex align-items-center gap-2" href="/">
-<img
-src="{{ site.logo }}" alt="{{ site.title }}" width="132" height="56" class="rounded"/>
-<span class="fw-semibold text-primary fs-3">{{ site.title }}</span>
-</a>
-<div>
-<button class="btn btn-outline-primary border-0 rounded-3 fs-5 fw-bold" onclick="openSearch()">
-<i class="bi bi-search me-2"></i>Search
-</button>
-<button
-class="navbar-toggler"
-type="button"
-data-bs-toggle="collapse"
-data-bs-target="#nav"
-aria-controls="nav"
-aria-expanded="false"
-aria-label="Toggle navigation">
-<span class="navbar-toggler-icon"></span>
-</button>
-</div>
-<div id="nav" class="collapse navbar-collapse">
-<ul class="navbar-nav ms-auto flex-column flex-md-row justify-content-md-end">
-{% for item in navbar %}
-<li class="nav-item">
-<a class="nav-link{% if page.url == item.href %} active{% endif %}" href="{{ item.href }}">
-{{ item.title }}
-</a>
-</li>
-{% endfor %}
-</ul>
-</div>
-</div>
+<nav class="ds-nav" aria-label="Main navigation">
+  <a href="/" class="ds-nav-brand">{{ site.name }}</a>
+
+  <div class="ds-nav-right">
+    <ul class="ds-nav-links" id="ds-nav-links">
+      {% for item in navbar %}
+      {% if item.bookingCta %}
+      <li>
+        <a href="{{ site.bookingUrl }}"
+           class="ds-nav-book"
+           target="_blank"
+           rel="noopener noreferrer">
+          {{ item.title }}
+          <i class="bi bi-arrow-up-right" aria-hidden="true" style="font-size:0.7em;"></i>
+        </a>
+      </li>
+      {% else %}
+      <li>
+        <a href="{{ item.href }}"
+           {% if page.url == item.href or (item.href != "/" and page.url and page.url.startsWith(item.href)) %}
+             class="active" aria-current="page"
+           {% endif %}>
+          {{ item.title }}
+        </a>
+      </li>
+      {% endif %}
+      {% endfor %}
+    </ul>
+
+    <!-- Search -->
+    <button class="ds-nav-icon-btn" id="ds-nav-search"
+            aria-label="Search" onclick="openSearch()">
+      <i class="bi bi-search" aria-hidden="true"></i>
+    </button>
+
+    <!-- Theme toggle -->
+    <button class="ds-nav-icon-btn" id="ds-theme-toggle"
+            aria-label="Toggle light/dark mode">
+      <i class="bi bi-sun" id="ds-theme-icon" aria-hidden="true"></i>
+    </button>
+
+    <!-- Mobile menu toggle -->
+    <button class="ds-nav-toggle" id="ds-nav-toggle"
+            aria-label="Toggle menu" aria-expanded="false">
+      <i class="bi bi-list" aria-hidden="true"></i>
+    </button>
+  </div>
 </nav>
-<!-- Search Modal -->
-<div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
-<div class="modal-dialog modal-lg modal-dialog-centered">
-<div class="modal-content border-0 shadow-lg">
-<div class="modal-header border-0 pb-0">
-<h5 class="modal-title text-primary fw-semibold" id="searchModalLabel">
-<i class="bi bi-search me-2"></i>{{ site.searchTitle | default("Search") }}
-</h5>
-<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-</div>
-<div class="modal-body pt-2">
-<div class="mb-3">
-<input
-type="text"
-class="form-control form-control-lg border-primary"
-id="searchInput"
-placeholder="{{ site.searchPlaceholder | default('Search content...') }}"
-oninput="performSearch()"/>
-</div>
-<div
-id="searchResults" class="search-results" style="max-height: 400px; overflow-y: auto"><!-- Results will appear here -->
-</div>
-</div>
-</div>
-</div>
+
+<!-- Search modal -->
+<div class="modal fade" id="searchModal" tabindex="-1"
+     aria-labelledby="searchModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title" id="searchModalLabel">
+          <i class="bi bi-search me-2" aria-hidden="true"></i>Search
+        </h5>
+        <button type="button" class="btn-close"
+                data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body pt-2">
+        <div class="mb-3">
+          <input type="text"
+                 class="form-control form-control-lg"
+                 id="searchInput"
+                 placeholder="Search shoots, events..."
+                 oninput="performSearch()"/>
+        </div>
+        <div id="searchResults" style="max-height:400px;overflow-y:auto;"></div>
+      </div>
+    </div>
+  </div>
 </div>

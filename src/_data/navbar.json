@@ -1,17 +1,6 @@
 [
-  {
-    "title": "Home",
-    "href": "/",
-    "footer": true
-  },
-  {
-    "title": "About",
-    "href": "/about",
-    "footer": true
-  },
-  {
-    "title": "Contact",
-    "href": "/contact",
-    "footer": true
-  }
+  { "title": "Home",      "href": "/",         "footer": true  },
+  { "title": "Portfolio", "href": "/gallery/",  "footer": true  },
+  { "title": "Contact",   "href": "/contact/",  "footer": true  },
+  { "title": "Book",      "href": "/book/",     "footer": false, "bookingCta": true }
 ]

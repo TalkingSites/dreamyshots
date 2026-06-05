@@ -1,7 +1,99 @@
----
-layout: base.njk
----
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<script>
+try{document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('ds-theme')||'dark');}catch(e){}
+</script>
+<title>{{ site.name }} | Event Photography</title>
+<meta name="description" content="{{ site.description }}"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+<link href="/assets/css/styles.css" rel="stylesheet"/>
+<link rel="icon" href="{{ site.favicon }}" type="image/x-icon"/>
+</head>
+<body>
 
-<div class="mb-5 homepage-hero">
-{{ content | safe }}
-</div>
+{% include "partials/navbar.njk" %}
+
+<main data-pagefind-body>
+
+  {# Hero #}
+  <section class="ds-hero">
+    <div class="ds-hero-inner">
+      <h1 class="ds-wordmark" aria-label="Dreamy Shots">
+        <span class="ds-wordmark-line1">Dreamy</span>
+        <span class="ds-wordmark-line2">Shots</span>
+      </h1>
+      <p class="ds-hero-line">Light remembered the way it felt.</p>
+      <a href="{{ site.bookingUrl }}" class="ds-cta" target="_blank" rel="noopener">
+        Book your event
+        <i class="bi bi-arrow-up-right" aria-hidden="true" style="font-size:0.75em;"></i>
+      </a>
+    </div>
+  </section>
+
+  {# Portfolio #}
+  <section class="ds-portfolio">
+    <div class="ds-portfolio-header">
+      <p class="ds-portfolio-eyebrow">Portfolio</p>
+      <h2 class="ds-portfolio-heading">Recent shoots</h2>
+    </div>
+
+    {% if collections.gallery and collections.gallery | length > 0 %}
+    <div class="ds-portfolio-grid">
+      {% for item in collections.gallery %}
+      <a href="{{ item.url }}" class="ds-portfolio-card"
+         aria-label="{{ item.data.title }}">
+        {% if item.data.thumbnailImage %}
+        <img src="{{ item.data.thumbnailImage }}"
+             alt="{{ item.data.title }}" loading="lazy"/>
+        {% else %}
+        <div style="display:flex;align-items:center;justify-content:center;
+                    height:100%;color:var(--ds-text-faint);font-size:0.7rem;
+                    letter-spacing:0.12em;text-transform:uppercase;">
+          No preview
+        </div>
+        {% endif %}
+        <div class="ds-portfolio-card-overlay">
+          <span class="ds-portfolio-card-title">{{ item.data.title }}</span>
+          {% if item.data.description %}
+          <span class="ds-portfolio-card-desc">{{ item.data.description }}</span>
+          {% endif %}
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="ds-portfolio-empty">
+      Portfolio coming soon. Check back after the next shoot.
+    </div>
+    {% endif %}
+  </section>
+
+  {# About #}
+  <section class="ds-about">
+    <figure class="ds-about-portrait">
+      <img src="/assets/images/wency.webp" alt="Wency, Dreamy Shots" loading="lazy"/>
+    </figure>
+    <div class="ds-about-text">
+      <p class="ds-about-quote">
+        I started shooting events because I believe every gathering deserves
+        to be captured the way it felt to be there. The soft light between
+        speeches, the laughter that happened off to the side, the moment
+        someone didn't know they were being watched. That's what I'm after.
+      </p>
+      <p class="ds-about-sig">- Wency</p>
+    </div>
+  </section>
+
+</main>
+
+{% include "partials/footer.njk" %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/search.js" defer></script>
+<script src="/assets/js/app.js" defer></script>
+</body>
+</html>
