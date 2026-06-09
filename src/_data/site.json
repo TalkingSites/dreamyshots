@@ -3,6 +3,7 @@
   "title": "Dreamy Shots",
   "url": "https://shots.dreamy.org",
   "bookingUrl": "https://bookdreamyshots.talkingsites.org",
+  "stripePaymentLink": "https://book.stripe.com/test_bJebIVaKzgGoedR7O924000",
   "description": "Event photography that captures the feeling of being there.",
   "logo": "/assets/images/logo.svg",
   "favicon": "/assets/images/ds-logo.svg"

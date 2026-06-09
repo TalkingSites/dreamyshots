@@ -6,12 +6,10 @@
       {% for item in navbar %}
       {% if item.bookingCta %}
       <li>
-        <a href="{{ site.bookingUrl }}"
+        <a href="{{ item.href }}"
            class="ds-nav-book"
-           target="_blank"
-           rel="noopener noreferrer">
+           {% if page.url and page.url.startsWith(item.href) %}aria-current="page"{% endif %}>
           {{ item.title }}
-          <i class="bi bi-arrow-up-right" aria-hidden="true" style="font-size:0.7em;"></i>
         </a>
       </li>
       {% else %}

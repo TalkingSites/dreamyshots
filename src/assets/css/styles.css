@@ -915,3 +915,439 @@ html[data-bs-theme="light"] .ds-hero::before {
   border-radius: 2px;
   overflow: hidden;
 }
+
+/* ── Booking page ────────────────────────────────────────────── */
+.ds-booking-wrap {
+  padding:   7rem 2rem 5rem;
+  max-width: 660px;
+  margin:    0 auto;
+  width:     100%;
+}
+
+/* Step indicator */
+.ds-booking-steps-bar {
+  display:       flex;
+  align-items:   center;
+  margin-bottom: 3rem;
+}
+
+.ds-booking-step-item {
+  display:     flex;
+  align-items: center;
+  gap:         0.6rem;
+  flex-shrink: 0;
+}
+
+.ds-step-num {
+  width:        28px;
+  height:       28px;
+  border-radius: 50%;
+  border:       1px solid var(--ds-border-faint);
+  color:        var(--ds-text-faint);
+  font-size:    0.72rem;
+  font-weight:  500;
+  display:      flex;
+  align-items:  center;
+  justify-content: center;
+  transition:   background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+.ds-step-label {
+  font-size:      0.7rem;
+  font-weight:    500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color:          var(--ds-text-faint);
+  transition:     color 0.25s ease;
+}
+
+.ds-booking-step-item.ds-step-active .ds-step-num {
+  background:   var(--ds-accent);
+  border-color: var(--ds-accent);
+  color:        var(--ds-bg);
+}
+
+.ds-booking-step-item.ds-step-active .ds-step-label { color: var(--ds-accent); }
+
+.ds-step-connector {
+  flex:       1;
+  height:     1px;
+  background: var(--ds-border-faint);
+  margin:     0 1rem;
+  max-width:  120px;
+}
+
+/* Step content */
+.ds-booking-title {
+  font-size:      clamp(1.75rem, 4vw, 2.5rem);
+  font-weight:    200;
+  color:          var(--ds-text);
+  margin:         0 0 0.75rem;
+  letter-spacing: -0.01em;
+  line-height:    1.15;
+}
+
+.ds-booking-intro {
+  font-size:   0.95rem;
+  font-weight: 300;
+  color:       var(--ds-text-muted);
+  line-height: 1.7;
+  margin:      0 0 2.25rem;
+}
+
+/* Calendar */
+.ds-cal {
+  background:    var(--ds-surface);
+  border:        1px solid var(--ds-border-faint);
+  padding:       1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.ds-cal-header {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  margin-bottom:   1.25rem;
+}
+
+.ds-cal-month-label {
+  font-size:      0.9rem;
+  font-weight:    500;
+  letter-spacing: 0.06em;
+  color:          var(--ds-text);
+}
+
+.ds-cal-nav {
+  background: none;
+  border:     1px solid var(--ds-border-faint);
+  color:      var(--ds-text-muted);
+  width:  30px;
+  height: 30px;
+  display:     flex;
+  align-items: center;
+  justify-content: center;
+  cursor:      pointer;
+  font-size:   0.8rem;
+  transition:  border-color 0.2s ease, color 0.2s ease;
+  border-radius: 2px;
+  padding:     0;
+}
+.ds-cal-nav:hover:not(:disabled) { border-color: var(--ds-accent); color: var(--ds-accent); }
+.ds-cal-nav:disabled             { opacity: 0.2; cursor: not-allowed; }
+
+.ds-cal-weekdays {
+  display:               grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom:         0.4rem;
+}
+.ds-cal-weekdays span {
+  text-align:     center;
+  font-size:      0.6rem;
+  font-weight:    500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color:          var(--ds-text-faint);
+  padding:        0.25rem 0;
+}
+
+.ds-cal-days {
+  display:               grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap:                   3px;
+}
+
+.ds-cal-day {
+  aspect-ratio: 1;
+  background:  none;
+  border:      1px solid transparent;
+  color:       var(--ds-text);
+  font-size:   0.85rem;
+  font-family: "Ubuntu", system-ui, sans-serif;
+  cursor:      pointer;
+  border-radius: 2px;
+  display:     flex;
+  align-items: center;
+  justify-content: center;
+  transition:  background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  padding:     0;
+  line-height: 1;
+}
+
+.ds-cal-blank  { pointer-events: none; }
+
+.ds-cal-day:hover:not(:disabled):not(.ds-cal-selected) {
+  background:   var(--ds-accent-subtle);
+  border-color: var(--ds-border);
+  color:        var(--ds-accent);
+}
+
+.ds-cal-today    { border-color: var(--ds-border); color: var(--ds-accent); font-weight: 500; }
+.ds-cal-selected { background: var(--ds-accent) !important; border-color: var(--ds-accent) !important; color: var(--ds-bg) !important; font-weight: 500; }
+.ds-cal-past     { color: var(--ds-text-faint); cursor: not-allowed; opacity: 0.4; }
+.ds-cal-booked   { color: var(--ds-text-faint); cursor: not-allowed; opacity: 0.3; text-decoration: line-through; }
+
+/* Time pickers — calendar week-view style ───────────────────── */
+.ds-time-pickers { margin-bottom: 2rem; }
+
+.ds-tg-instruction {
+  font-size:   0.8rem;
+  font-weight: 300;
+  color:       var(--ds-text-muted);
+  margin:      0 0 0.85rem;
+  min-height:  1.2em;
+  letter-spacing: 0.02em;
+  transition:  color 0.2s ease;
+}
+.ds-tg-instruction.ds-tg-complete { color: var(--ds-accent); font-weight: 400; }
+
+.ds-tg-wrap {
+  height:          380px;
+  overflow-y:      auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ds-border-faint) transparent;
+  border:          1px solid var(--ds-border-faint);
+  background:      var(--ds-surface);
+}
+.ds-tg-wrap::-webkit-scrollbar       { width: 3px; }
+.ds-tg-wrap::-webkit-scrollbar-track { background: transparent; }
+.ds-tg-wrap::-webkit-scrollbar-thumb { background: var(--ds-border-faint); }
+
+.ds-tg { width: 100%; }
+
+.ds-tg-row {
+  display:     flex;
+  align-items: stretch;
+  height:      34px;
+}
+
+.ds-tg-label {
+  width:           5rem;
+  flex-shrink:     0;
+  font-size:       0.62rem;
+  color:           var(--ds-text-faint);
+  text-align:      right;
+  padding:         4px 0.7rem 0 0;
+  pointer-events:  none;
+  user-select:     none;
+  border-right:    1px solid var(--ds-border-faint);
+  box-sizing:      border-box;
+}
+.ds-tg-hour-label {
+  font-size:   0.68rem;
+  font-weight: 500;
+  color:       var(--ds-text-muted);
+}
+
+.ds-tg-slot {
+  flex:       1;
+  height:     34px;
+  background: transparent;
+  border:     none;
+  border-bottom: 1px solid var(--ds-border-faint);
+  cursor:     pointer;
+  padding:    0;
+  transition: background 0.1s ease;
+  display:    block;
+}
+
+/* Stronger line at each hour boundary */
+.ds-tg-row-hour .ds-tg-slot { border-bottom-color: var(--ds-border); }
+
+.ds-tg-slot:hover:not(.ds-slot-start):not(.ds-slot-end):not(.ds-slot-range):not(.ds-slot-below-min) {
+  background: var(--ds-accent-subtle);
+}
+
+/* Slots inside the 3-hour minimum window — visually muted, not valid end times */
+.ds-slot-below-min { opacity: 0.25; }
+
+/* Hover preview while choosing end time */
+.ds-slot-preview { background: rgba(200, 147, 90, 0.10) !important; }
+
+/* Filled range */
+.ds-slot-range {
+  background:           rgba(200, 147, 90, 0.22) !important;
+  border-bottom-color:  rgba(200, 147, 90, 0.15) !important;
+}
+
+/* Start and end markers */
+.ds-slot-start,
+.ds-slot-end   { background: var(--ds-accent) !important; border-bottom-color: var(--ds-accent-dark) !important; }
+
+/* Light mode adjustments */
+html[data-bs-theme="light"] .ds-slot-preview { background: rgba(160, 108, 58, 0.10) !important; }
+html[data-bs-theme="light"] .ds-slot-range   { background: rgba(160, 108, 58, 0.22) !important; }
+
+/* Required field marker */
+.ds-required-mark { color: var(--ds-accent); margin-left: 0.15em; }
+
+/* Booking actions */
+.ds-booking-actions {
+  display:      flex;
+  align-items:  center;
+  gap:          1.5rem;
+  margin-top:   2.5rem;
+  padding-top:  2rem;
+  border-top:   1px solid var(--ds-border-faint);
+}
+
+.ds-booking-btn {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             0.5rem;
+  padding:         0.8rem 1.75rem;
+  background:      transparent;
+  border:          1px solid var(--ds-accent);
+  color:           var(--ds-accent);
+  font-size:       0.78rem;
+  font-family:     "Ubuntu", system-ui, sans-serif;
+  font-weight:     500;
+  letter-spacing:  0.1em;
+  text-transform:  uppercase;
+  cursor:          pointer;
+  transition:      background 0.25s ease, color 0.25s ease;
+  border-radius:   0;
+}
+.ds-booking-btn:hover:not(:disabled) { background: var(--ds-accent); color: var(--ds-bg); }
+.ds-booking-btn:disabled             { opacity: 0.3; cursor: not-allowed; }
+
+.ds-booking-btn-back {
+  background: none;
+  border:     none;
+  color:      var(--ds-text-muted);
+  font-size:  0.75rem;
+  font-family: "Ubuntu", system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  cursor:     pointer;
+  display:    inline-flex;
+  align-items: center;
+  gap:        0.4rem;
+  padding:    0;
+  transition: color 0.2s ease;
+}
+.ds-booking-btn-back:hover { color: var(--ds-accent); }
+
+/* Step 2 summary bar */
+.ds-booking-summary-bar {
+  background:    var(--ds-surface);
+  border:        1px solid var(--ds-border-faint);
+  border-left:   3px solid var(--ds-accent);
+  padding:       1.25rem 1.5rem;
+  margin-bottom: 2.5rem;
+  display:       flex;
+  flex-wrap:     wrap;
+  gap:           1.25rem;
+  align-items:   center;
+}
+
+.ds-summary-row {
+  display:     flex;
+  align-items: center;
+  gap:         0.55rem;
+  font-size:   0.88rem;
+  color:       var(--ds-text);
+  font-weight: 300;
+}
+.ds-summary-row i { color: var(--ds-accent); font-size: 0.85rem; flex-shrink: 0; }
+
+/* Food/drink toggle */
+.ds-form-hint {
+  font-size:   0.8rem;
+  color:       var(--ds-text-muted);
+  font-weight: 300;
+  margin:      0 0 0.85rem;
+}
+
+.ds-form-optional {
+  font-weight: 300;
+  font-size:   0.9em;
+  color:       var(--ds-text-faint);
+}
+
+.ds-toggle-group { display: inline-flex; }
+
+.ds-toggle-opt {
+  position:    relative;
+  cursor:      pointer;
+  user-select: none;
+}
+
+.ds-toggle-opt input[type="radio"] {
+  position:       absolute;
+  opacity:        0;
+  width:          0;
+  height:         0;
+  pointer-events: none;
+}
+
+.ds-toggle-opt span {
+  display:        block;
+  padding:        0.55rem 1.75rem;
+  background:     var(--ds-surface);
+  border:         1px solid var(--ds-border-faint);
+  color:          var(--ds-text-muted);
+  font-size:      0.8rem;
+  font-weight:    400;
+  letter-spacing: 0.06em;
+  cursor:         pointer;
+  transition:     background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.ds-toggle-opt:first-child span { border-right: none; border-radius: 2px 0 0 2px; }
+.ds-toggle-opt:last-child span  { border-radius: 0 2px 2px 0; }
+.ds-toggle-opt:hover span                          { border-color: var(--ds-accent); color: var(--ds-accent); }
+.ds-toggle-opt input[type="radio"]:checked + span  { background: var(--ds-accent); border-color: var(--ds-accent); color: var(--ds-bg); }
+
+/* Validation */
+.ds-booking-form.ds-form-validated .ds-form-input:invalid { border-color: #b85c4a; }
+
+/* Confirmation screen */
+.ds-booking-confirm-inner {
+  padding:    3rem 1rem 2rem;
+  max-width:  480px;
+  margin:     0 auto;
+  text-align: center;
+}
+
+.ds-booking-confirm-icon {
+  font-size:     2.75rem;
+  color:         var(--ds-accent);
+  margin-bottom: 1.25rem;
+  line-height:   1;
+}
+
+.ds-booking-confirm-title {
+  font-size:      clamp(1.75rem, 4vw, 2.5rem);
+  font-weight:    200;
+  color:          var(--ds-text);
+  margin:         0 0 1rem;
+  letter-spacing: -0.01em;
+}
+
+.ds-booking-confirm-msg {
+  font-size:   0.95rem;
+  font-weight: 300;
+  color:       var(--ds-text-muted);
+  line-height: 1.8;
+  margin:      0 0 1.5rem;
+}
+
+.ds-booking-confirm-date {
+  font-size:      0.85rem;
+  color:          var(--ds-accent);
+  background:     var(--ds-accent-subtle);
+  border:         1px solid var(--ds-border);
+  padding:        0.8rem 1.5rem;
+  margin-bottom:  0.5rem;
+  display:        inline-block;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 560px) {
+  .ds-booking-wrap        { padding: 5.5rem 1.25rem 4rem; }
+  .ds-cal                 { padding: 1rem; }
+  .ds-cal-weekdays span   { font-size: 0.55rem; }
+  .ds-cal-day             { font-size: 0.8rem; }
+  .ds-tg-wrap             { height: 320px; }
+  .ds-tg-label            { width: 4rem; font-size: 0.58rem; padding: 4px 0.5rem 0 0; }
+  .ds-booking-steps-bar   { margin-bottom: 2rem; }
+  .ds-booking-summary-bar { flex-direction: column; gap: 0.75rem; }
+}
