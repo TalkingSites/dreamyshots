@@ -3,13 +3,8 @@
 
   const MIN_HOURS = 3;
 
-  // ── Mock booked dates (YYYY-MM-DD) ─────────────────────────────────────────
-  const MOCK_BOOKED = [
-    '2026-06-10', '2026-06-15', '2026-06-22', '2026-06-28',
-    '2026-07-04', '2026-07-11', '2026-07-18', '2026-07-25',
-    '2026-08-01', '2026-08-09', '2026-08-16',
-    '2026-09-05', '2026-09-12', '2026-09-19',
-  ];
+  // ── Booked dates — loaded from Radicale on init ────────────────────────────
+  let remoteBookedDates = [];
 
   const SESSION_KEY = 'ds-session-bookings';
 
@@ -27,7 +22,19 @@
   }
 
   function isBooked(d) {
-    return MOCK_BOOKED.includes(d) || getSessionBookings().includes(d);
+    return remoteBookedDates.includes(d) || getSessionBookings().includes(d);
+  }
+
+  async function loadBookedDates() {
+    try {
+      const res  = await fetch('/.netlify/functions/get-booked-dates');
+      const data = await res.json();
+      if (Array.isArray(data.booked)) remoteBookedDates = data.booked;
+    } catch (e) {
+      // If the function is unreachable (e.g. local dev without Netlify CLI),
+      // fall back silently — the calendar just won't show remote bookings.
+    }
+    renderCalendar();
   }
 
   // ── Time helpers ───────────────────────────────────────────────────────────
@@ -334,8 +341,8 @@
     `;
   }
 
-  // ── Form submit → Stripe ───────────────────────────────────────────────────
-  function onFormSubmit(e) {
+  // ── Form submit → Radicale ────────────────────────────────────────────────
+  async function onFormSubmit(e) {
     e.preventDefault();
     const form = e.target;
     if (!form.checkValidity()) {
@@ -345,33 +352,50 @@
       return;
     }
 
-    saveSessionBooking(state.selectedDate);
+    const submitBtn = form.querySelector('[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Saving…';
 
-    const stripeLink = (window.__DS_STRIPE || '').trim();
-    if (stripeLink.startsWith('https://')) {
-      const email = (form.querySelector('[name="email"]') || {}).value || '';
-      const qty   = durationHours(state.startTime, state.endTime);
+    const payload = {
+      date:         state.selectedDate,
+      startTime:    state.startTime,
+      endTime:      state.endTime,
+      name:         form.querySelector('[name="name"]').value.trim(),
+      phone:        form.querySelector('[name="phone"]').value.trim(),
+      email:        form.querySelector('[name="email"]').value.trim(),
+      address:      form.querySelector('[name="address"]').value.trim(),
+      organisation: (form.querySelector('[name="organisation"]') || {}).value || '',
+      abn:          (form.querySelector('[name="abn"]') || {}).value || '',
+      food:         (form.querySelector('[name="food"]:checked') || {}).value || 'no',
+    };
 
-      // Compact reference Wency can cross-check against Stripe payments
-      const ref = 'DS-' +
-        state.selectedDate.replace(/-/g, '') + '-' +
-        state.startTime.replace(':', '') + '-' +
-        state.endTime.replace(':', '');
+    try {
+      const res  = await fetch('/.netlify/functions/create-booking', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
+      });
+      const data = await res.json();
 
-      const url = new URL(stripeLink);
-      url.searchParams.set('prefilled_quantity',    qty);
-      url.searchParams.set('client_reference_id',   ref);
-      if (email) url.searchParams.set('prefilled_email', email);
+      if (!res.ok) {
+        submitBtn.disabled  = false;
+        submitBtn.innerHTML = 'Proceed to Payment <i class="bi bi-lock-fill" aria-hidden="true" style="font-size:0.8em;"></i>';
+        alert(data.error || 'Something went wrong. Please try again.');
+        return;
+      }
 
-      window.location.href = url.toString();
-    } else {
-      // Stripe not configured — placeholder confirmation
+      saveSessionBooking(state.selectedDate);
+
       const confirmDate = `${fmtDateLong(state.selectedDate)}, ${fmt12(state.startTime)} to ${fmt12(state.endTime)}`;
-      $id('ds-confirm-date').textContent    = confirmDate;
-      $id('ds-booking-step2').hidden        = true;
-      $id('ds-booking-confirm').hidden      = false;
-      $id('ds-booking-steps-bar').hidden    = true;
+      $id('ds-confirm-date').textContent = confirmDate;
+      $id('ds-booking-step2').hidden     = true;
+      $id('ds-booking-confirm').hidden   = false;
+      $id('ds-booking-steps-bar').hidden = true;
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      submitBtn.disabled  = false;
+      submitBtn.innerHTML = 'Proceed to Payment <i class="bi bi-lock-fill" aria-hidden="true" style="font-size:0.8em;"></i>';
+      alert('Network error. Please check your connection and try again.');
     }
   }
 
@@ -379,7 +403,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     if (!$id('ds-calendar')) return;
 
-    renderCalendar();
+    loadBookedDates(); // fetches from Radicale then calls renderCalendar()
 
     $id('ds-cal-prev').addEventListener('click', onPrevMonth);
     $id('ds-cal-next').addEventListener('click', onNextMonth);
