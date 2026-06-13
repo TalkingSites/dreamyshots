@@ -1,15 +1,10 @@
 (function () {
   'use strict';
 
-  const MIN_HOURS = 3;
+  const MIN_HOURS = 2;
 
-  // ── Mock booked dates (YYYY-MM-DD) ─────────────────────────────────────────
-  const MOCK_BOOKED = [
-    '2026-06-10', '2026-06-15', '2026-06-22', '2026-06-28',
-    '2026-07-04', '2026-07-11', '2026-07-18', '2026-07-25',
-    '2026-08-01', '2026-08-09', '2026-08-16',
-    '2026-09-05', '2026-09-12', '2026-09-19',
-  ];
+  // ── Booked dates — loaded from Radicale on init ────────────────────────────
+  let remoteBookedDates = [];
 
   const SESSION_KEY = 'ds-session-bookings';
 
@@ -27,7 +22,18 @@
   }
 
   function isBooked(d) {
-    return MOCK_BOOKED.includes(d) || getSessionBookings().includes(d);
+    return remoteBookedDates.includes(d) || getSessionBookings().includes(d);
+  }
+
+  async function loadBookedDates() {
+    try {
+      const res  = await fetch('/.netlify/functions/get-booked-dates');
+      const data = await res.json();
+      if (Array.isArray(data.booked)) remoteBookedDates = data.booked;
+    } catch (e) {
+      // Falls back silently — calendar won't show remote bookings in local dev without Netlify CLI.
+    }
+    renderCalendar();
   }
 
   // ── Time helpers ───────────────────────────────────────────────────────────
@@ -44,8 +50,24 @@
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
   }
 
+  function durationMins(start, end) {
+    return toMins(end) - toMins(start);
+  }
+
   function durationHours(start, end) {
-    return Math.ceil((toMins(end) - toMins(start)) / 60);
+    return Math.ceil(durationMins(start, end) / 60);
+  }
+
+  function isBelowMin(t) {
+    return state.startTime &&
+      t > state.startTime &&
+      durationMins(state.startTime, t) < MIN_HOURS * 60;
+  }
+
+  function isValidEnd(t) {
+    return state.startTime &&
+      t > state.startTime &&
+      durationMins(state.startTime, t) >= MIN_HOURS * 60;
   }
 
   // ── Time slots: 6 AM to midnight ───────────────────────────────────────────
@@ -204,56 +226,58 @@
     });
   }
 
-  function isValidEnd(t) {
-    return state.startTime && t > state.startTime &&
-      (toMins(t) - toMins(state.startTime)) >= MIN_HOURS * 60;
-  }
-
   function updateSlotClasses() {
+    const endSet  = state.startTime && state.endTime;
+    const isWarn  = endSet && durationMins(state.startTime, state.endTime) < MIN_HOURS * 60;
+
+    $id('ds-tg-wrap').classList.toggle('ds-tg-warn', !!isWarn);
+
     document.querySelectorAll('.ds-tg-slot').forEach(slot => {
       const t = slot.dataset.time;
-      slot.classList.remove('ds-slot-start', 'ds-slot-end', 'ds-slot-range', 'ds-slot-below-min');
+      slot.classList.remove('ds-slot-start', 'ds-slot-end', 'ds-slot-range', 'ds-slot-under-min');
 
       if (t === state.startTime) {
         slot.classList.add('ds-slot-start');
       } else if (t === state.endTime) {
         slot.classList.add('ds-slot-end');
-      } else if (state.startTime && state.endTime && t > state.startTime && t < state.endTime) {
+      } else if (endSet && t > state.startTime && t < state.endTime) {
         slot.classList.add('ds-slot-range');
-      } else if (state.startTime && !state.endTime && t > state.startTime && !isValidEnd(t)) {
-        slot.classList.add('ds-slot-below-min');
+      } else if (state.startTime && !state.endTime && isBelowMin(t)) {
+        slot.classList.add('ds-slot-under-min');
       }
     });
   }
 
   function onSlotHover(t) {
     if (!state.startTime || state.endTime) return;
-    if (!isValidEnd(t)) return; // don't preview the below-min zone
+    if (t <= state.startTime) return;
     clearPreview();
+    const warn = durationMins(state.startTime, t) < MIN_HOURS * 60;
     document.querySelectorAll('.ds-tg-slot').forEach(slot => {
       const st = slot.dataset.time;
-      if (st > state.startTime && st <= t) slot.classList.add('ds-slot-preview');
+      if (st > state.startTime && st <= t) {
+        slot.classList.add(warn ? 'ds-slot-preview-warn' : 'ds-slot-preview');
+      }
     });
   }
 
   function clearPreview() {
-    document.querySelectorAll('.ds-slot-preview').forEach(el => el.classList.remove('ds-slot-preview'));
+    document.querySelectorAll('.ds-slot-preview, .ds-slot-preview-warn')
+      .forEach(el => el.classList.remove('ds-slot-preview', 'ds-slot-preview-warn'));
   }
 
   function onSlotClick(t) {
     if (!state.startTime || state.endTime) {
-      // Fresh start
       state.startTime = t;
       state.endTime   = null;
-    } else if (isValidEnd(t)) {
-      // Valid end time
+    } else if (t > state.startTime) {
       state.endTime = t;
       clearPreview();
       setTimeout(() => {
         $id('ds-booking-continue').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }, 120);
     } else {
-      // Clicked at/before start, or within min window — reset to new start
+      // Clicked at or before start — reset
       state.startTime = t;
       state.endTime   = null;
     }
@@ -264,21 +288,28 @@
 
   function updateInstruction() {
     const el = $id('ds-tg-instruction');
+    el.classList.remove('ds-tg-complete', 'ds-tg-warn-msg');
+
     if (!state.startTime) {
       el.textContent = 'Tap a slot to set arrival time';
-      el.classList.remove('ds-tg-complete');
     } else if (!state.endTime) {
       const earliest = addMins(state.startTime, MIN_HOURS * 60);
       const hasValid  = GRID_SLOTS.some(t => isValidEnd(t));
       if (!hasValid) {
         el.textContent = `${fmt12(state.startTime)} is too late for a ${MIN_HOURS}-hour booking. Please select an earlier arrival.`;
+        el.classList.add('ds-tg-warn-msg');
       } else {
-        el.textContent = `Arrival: ${fmt12(state.startTime)} — tap a finish time (earliest ${fmt12(earliest)})`;
+        el.textContent = `Arrival: ${fmt12(state.startTime)} — tap a finish time (minimum ${fmt12(earliest)})`;
       }
-      el.classList.remove('ds-tg-complete');
     } else {
-      el.textContent = `${fmt12(state.startTime)} to ${fmt12(state.endTime)}`;
-      el.classList.add('ds-tg-complete');
+      const mins = durationMins(state.startTime, state.endTime);
+      if (mins < MIN_HOURS * 60) {
+        el.textContent = `${fmt12(state.startTime)} to ${fmt12(state.endTime)} — minimum booking is ${MIN_HOURS} hours`;
+        el.classList.add('ds-tg-warn-msg');
+      } else {
+        el.textContent = `${fmt12(state.startTime)} to ${fmt12(state.endTime)}`;
+        el.classList.add('ds-tg-complete');
+      }
     }
   }
 
@@ -297,8 +328,18 @@
 
   // ── Continue ───────────────────────────────────────────────────────────────
   function updateContinue() {
-    $id('ds-booking-continue').disabled =
-      !(state.selectedDate && state.startTime && state.endTime);
+    const hasAll   = state.selectedDate && state.startTime && state.endTime;
+    const tooShort = hasAll && durationMins(state.startTime, state.endTime) < MIN_HOURS * 60;
+    const btn      = $id('ds-booking-continue');
+    const wrap     = $id('ds-continue-wrap');
+
+    btn.disabled = !hasAll || tooShort;
+
+    if (tooShort) {
+      wrap.setAttribute('data-tooltip', `Minimum booking is ${MIN_HOURS} hours`);
+    } else {
+      wrap.removeAttribute('data-tooltip');
+    }
   }
 
   // ── Step navigation ────────────────────────────────────────────────────────
@@ -334,8 +375,61 @@
     `;
   }
 
-  // ── Form submit → Stripe ───────────────────────────────────────────────────
-  function onFormSubmit(e) {
+  // ── Add to Calendar ────────────────────────────────────────────────────────
+  function toICSLocal(dateStr, timeStr) {
+    const d = dateStr.replace(/-/g, '');
+    const t = (timeStr === '24:00' ? '23:59' : timeStr).replace(':', '') + '00';
+    return `${d}T${t}`;
+  }
+
+  function makeICS() {
+    const uid  = `DS-${state.selectedDate.replace(/-/g, '')}-${state.startTime.replace(':', '')}@dreamyshots`;
+    const now  = new Date().toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z';
+    return [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Dreamy Shots//Booking//EN',
+      'CALSCALE:GREGORIAN',
+      'BEGIN:VEVENT',
+      `UID:${uid}`,
+      `DTSTAMP:${now}`,
+      `DTSTART;TZID=Australia/Sydney:${toICSLocal(state.selectedDate, state.startTime)}`,
+      `DTEND;TZID=Australia/Sydney:${toICSLocal(state.selectedDate, state.endTime)}`,
+      'SUMMARY:Dreamy Shots Photography',
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\r\n');
+  }
+
+  function downloadICS() {
+    const blob = new Blob([makeICS()], { type: 'text/calendar' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `dreamy-shots-${state.selectedDate}.ics`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function googleCalUrl() {
+    const start = toICSLocal(state.selectedDate, state.startTime);
+    const end   = toICSLocal(state.selectedDate, state.endTime);
+    const p = new URLSearchParams({
+      action:  'TEMPLATE',
+      text:    'Dreamy Shots Photography',
+      dates:   `${start}/${end}`,
+      details: 'Event photography by Dreamy Shots.',
+    });
+    return `https://calendar.google.com/calendar/render?${p}`;
+  }
+
+  function setupAddToCalendar() {
+    $id('ds-ics-btn').addEventListener('click', downloadICS);
+    $id('ds-gcal-btn').href = googleCalUrl();
+  }
+
+  // ── Form submit → Radicale ────────────────────────────────────────────────
+  async function onFormSubmit(e) {
     e.preventDefault();
     const form = e.target;
     if (!form.checkValidity()) {
@@ -345,33 +439,51 @@
       return;
     }
 
-    saveSessionBooking(state.selectedDate);
+    const submitBtn = form.querySelector('[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Saving…';
 
-    const stripeLink = (window.__DS_STRIPE || '').trim();
-    if (stripeLink.startsWith('https://')) {
-      const email = (form.querySelector('[name="email"]') || {}).value || '';
-      const qty   = durationHours(state.startTime, state.endTime);
+    const payload = {
+      date:         state.selectedDate,
+      startTime:    state.startTime,
+      endTime:      state.endTime,
+      name:         form.querySelector('[name="name"]').value.trim(),
+      phone:        form.querySelector('[name="phone"]').value.trim(),
+      email:        form.querySelector('[name="email"]').value.trim(),
+      address:      form.querySelector('[name="address"]').value.trim(),
+      organisation: (form.querySelector('[name="organisation"]') || {}).value || '',
+      abn:          (form.querySelector('[name="abn"]') || {}).value || '',
+      food:         (form.querySelector('[name="food"]:checked') || {}).value || 'no',
+    };
 
-      // Compact reference Wency can cross-check against Stripe payments
-      const ref = 'DS-' +
-        state.selectedDate.replace(/-/g, '') + '-' +
-        state.startTime.replace(':', '') + '-' +
-        state.endTime.replace(':', '');
+    try {
+      const res  = await fetch('/.netlify/functions/create-booking', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
+      });
+      const data = await res.json();
 
-      const url = new URL(stripeLink);
-      url.searchParams.set('prefilled_quantity',    qty);
-      url.searchParams.set('client_reference_id',   ref);
-      if (email) url.searchParams.set('prefilled_email', email);
+      if (!res.ok) {
+        submitBtn.disabled  = false;
+        submitBtn.innerHTML = 'Proceed to Payment <i class="bi bi-lock-fill" aria-hidden="true" style="font-size:0.8em;"></i>';
+        alert(data.error || 'Something went wrong. Please try again.');
+        return;
+      }
 
-      window.location.href = url.toString();
-    } else {
-      // Stripe not configured — placeholder confirmation
+      saveSessionBooking(state.selectedDate);
+      setupAddToCalendar();
+
       const confirmDate = `${fmtDateLong(state.selectedDate)}, ${fmt12(state.startTime)} to ${fmt12(state.endTime)}`;
-      $id('ds-confirm-date').textContent    = confirmDate;
-      $id('ds-booking-step2').hidden        = true;
-      $id('ds-booking-confirm').hidden      = false;
-      $id('ds-booking-steps-bar').hidden    = true;
+      $id('ds-confirm-date').textContent = confirmDate;
+      $id('ds-booking-step2').hidden     = true;
+      $id('ds-booking-confirm').hidden   = false;
+      $id('ds-booking-steps-bar').hidden = true;
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      submitBtn.disabled  = false;
+      submitBtn.innerHTML = 'Proceed to Payment <i class="bi bi-lock-fill" aria-hidden="true" style="font-size:0.8em;"></i>';
+      alert('Network error. Please check your connection and try again.');
     }
   }
 
@@ -379,7 +491,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     if (!$id('ds-calendar')) return;
 
-    renderCalendar();
+    loadBookedDates(); // fetches from Radicale then calls renderCalendar()
 
     $id('ds-cal-prev').addEventListener('click', onPrevMonth);
     $id('ds-cal-next').addEventListener('click', onNextMonth);

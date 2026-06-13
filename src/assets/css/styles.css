@@ -685,6 +685,40 @@ html[data-bs-theme="light"] .ds-hero::before {
   color:        var(--ds-accent);
 }
 
+.ds-footer-left {
+  display:        flex;
+  flex-direction: column;
+  gap:            0.5rem;
+}
+
+.ds-footer-cc-row {
+  display:     flex;
+  align-items: center;
+  gap:         0.6rem;
+}
+
+.ds-footer-cc {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             0.3rem;
+  color:           var(--ds-text-faint);
+  text-decoration: none;
+  transition:      color 0.2s ease;
+}
+.ds-footer-cc:hover { color: var(--ds-text-muted); }
+
+.ds-footer-github {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             0.4rem;
+  font-size:       0.72rem;
+  color:           var(--ds-text-faint);
+  text-decoration: none;
+  letter-spacing:  0.03em;
+  transition:      color 0.2s ease;
+}
+.ds-footer-github:hover { color: var(--ds-text); }
+
 /* ── Gallery event page ──────────────────────────────────────── */
 .ds-event-page { padding-top: 5rem; flex: 1; }
 
@@ -1153,15 +1187,16 @@ html[data-bs-theme="light"] .ds-hero::before {
 /* Stronger line at each hour boundary */
 .ds-tg-row-hour .ds-tg-slot { border-bottom-color: var(--ds-border); }
 
-.ds-tg-slot:hover:not(.ds-slot-start):not(.ds-slot-end):not(.ds-slot-range):not(.ds-slot-below-min) {
+.ds-tg-slot:hover:not(.ds-slot-start):not(.ds-slot-end):not(.ds-slot-range) {
   background: var(--ds-accent-subtle);
 }
 
-/* Slots inside the 3-hour minimum window — visually muted, not valid end times */
-.ds-slot-below-min { opacity: 0.25; }
+/* Slots within the minimum window — subtle red tint, still clickable */
+.ds-slot-under-min { background: rgba(180, 60, 50, 0.06); }
 
-/* Hover preview while choosing end time */
-.ds-slot-preview { background: rgba(200, 147, 90, 0.10) !important; }
+/* Hover previews */
+.ds-slot-preview      { background: rgba(200, 147, 90, 0.10) !important; }
+.ds-slot-preview-warn { background: rgba(180, 60, 50, 0.12) !important; }
 
 /* Filled range */
 .ds-slot-range {
@@ -1173,12 +1208,53 @@ html[data-bs-theme="light"] .ds-hero::before {
 .ds-slot-start,
 .ds-slot-end   { background: var(--ds-accent) !important; border-bottom-color: var(--ds-accent-dark) !important; }
 
+/* Warning state — selection is under the minimum duration */
+.ds-tg-wrap.ds-tg-warn .ds-slot-start,
+.ds-tg-wrap.ds-tg-warn .ds-slot-end   { background: rgba(180, 60, 50, 0.75) !important; border-bottom-color: rgba(140, 40, 30, 0.6) !important; }
+.ds-tg-wrap.ds-tg-warn .ds-slot-range { background: rgba(180, 60, 50, 0.20) !important; border-bottom-color: rgba(180, 60, 50, 0.12) !important; }
+
+/* Instruction text warning state */
+.ds-tg-instruction.ds-tg-warn-msg { color: #c05040; font-weight: 400; }
+
 /* Light mode adjustments */
 html[data-bs-theme="light"] .ds-slot-preview { background: rgba(160, 108, 58, 0.10) !important; }
 html[data-bs-theme="light"] .ds-slot-range   { background: rgba(160, 108, 58, 0.22) !important; }
 
 /* Required field marker */
 .ds-required-mark { color: var(--ds-accent); margin-left: 0.15em; }
+
+/* Tooltip wrapper for disabled Continue button */
+.ds-btn-tooltip-wrap {
+  position: relative;
+  display:  inline-block;
+}
+.ds-btn-tooltip-wrap[data-tooltip]:hover::after {
+  content:      attr(data-tooltip);
+  position:     absolute;
+  bottom:       calc(100% + 8px);
+  left:         50%;
+  transform:    translateX(-50%);
+  background:   #c05040;
+  color:        #fff;
+  padding:      0.35em 0.8em;
+  border-radius: 4px;
+  white-space:  nowrap;
+  font-size:    0.75rem;
+  letter-spacing: 0.03em;
+  pointer-events: none;
+  z-index:      20;
+}
+.ds-btn-tooltip-wrap[data-tooltip]:hover::before {
+  content:    '';
+  position:   absolute;
+  bottom:     calc(100% + 2px);
+  left:       50%;
+  transform:  translateX(-50%);
+  border:     5px solid transparent;
+  border-top-color: #c05040;
+  pointer-events: none;
+  z-index:    20;
+}
 
 /* Booking actions */
 .ds-booking-actions {
@@ -1340,6 +1416,37 @@ html[data-bs-theme="light"] .ds-slot-range   { background: rgba(160, 108, 58, 0.
   display:        inline-block;
   letter-spacing: 0.02em;
 }
+
+/* Add to Calendar buttons on confirmation screen */
+.ds-add-to-cal {
+  display:         flex;
+  flex-wrap:       wrap;
+  gap:             0.75rem;
+  justify-content: center;
+  margin:          1.75rem 0 0.5rem;
+}
+
+.ds-add-cal-btn {
+  display:        inline-flex;
+  align-items:    center;
+  gap:            0.5rem;
+  padding:        0.6rem 1.2rem;
+  font-size:      0.78rem;
+  font-family:    "Ubuntu", system-ui, sans-serif;
+  font-weight:    500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor:         pointer;
+  border-radius:  0;
+  border:         1px solid var(--ds-border);
+  background:     transparent;
+  color:          var(--ds-text-muted);
+  text-decoration: none;
+  transition:     border-color 0.2s, color 0.2s;
+}
+.ds-add-cal-btn:hover { border-color: var(--ds-accent); color: var(--ds-accent); }
+.ds-add-cal-google { border-color: #1a73e8; color: #1a73e8; }
+.ds-add-cal-google:hover { background: rgba(26, 115, 232, 0.08); color: #1a73e8; border-color: #1a73e8; }
 
 @media (max-width: 560px) {
   .ds-booking-wrap        { padding: 5.5rem 1.25rem 4rem; }

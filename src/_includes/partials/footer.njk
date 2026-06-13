@@ -1,7 +1,18 @@
 <footer class="ds-footer" id="footer-main">
-  <span class="ds-footer-copy">
-    &copy; {{ global.currentYear }} <i class="bi bi-camera2" aria-hidden="true" style="vertical-align:middle;font-size:1.4em;"></i> {{ site.name }}
-  </span>
+  <div class="ds-footer-left">
+    <div class="ds-footer-cc-row">
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" class="ds-footer-cc" target="_blank" rel="noopener noreferrer" title="Creative Commons Attribution-NonCommercial-NoDerivatives 4.0">
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-label="Creative Commons" role="img"><circle cx="10" cy="10" r="9.5" fill="none" stroke="currentColor" stroke-width="1"/><text x="10" y="13.5" text-anchor="middle" font-size="6.5" font-family="sans-serif" font-weight="bold" fill="currentColor">CC</text></svg>
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-label="Attribution" role="img"><circle cx="10" cy="10" r="9.5" fill="none" stroke="currentColor" stroke-width="1"/><text x="10" y="13.5" text-anchor="middle" font-size="6.5" font-family="sans-serif" font-weight="bold" fill="currentColor">BY</text></svg>
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-label="NonCommercial" role="img"><circle cx="10" cy="10" r="9.5" fill="none" stroke="currentColor" stroke-width="1"/><text x="10" y="13.5" text-anchor="middle" font-size="6.5" font-family="sans-serif" font-weight="bold" fill="currentColor">NC</text></svg>
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-label="NoDerivatives" role="img"><circle cx="10" cy="10" r="9.5" fill="none" stroke="currentColor" stroke-width="1"/><text x="10" y="13.5" text-anchor="middle" font-size="6.5" font-family="sans-serif" font-weight="bold" fill="currentColor">ND</text></svg>
+      </a>
+      <span class="ds-footer-copy">{{ global.currentYear }} {{ site.name }}</span>
+    </div>
+    <a href="https://github.com/TalkingSites/dreamyshots" class="ds-footer-github" target="_blank" rel="noopener noreferrer">
+      <i class="bi bi-github" aria-hidden="true"></i> TalkingSites/dreamyshots
+    </a>
+  </div>
   <ul class="ds-footer-links">
     {% for item in navbar %}
     {% if item.footer %}
