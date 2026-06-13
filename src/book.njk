@@ -56,9 +56,11 @@ bookingPage: true
     </div>
 
     <div class="ds-booking-actions">
-      <button class="ds-booking-btn" id="ds-booking-continue" type="button" disabled>
-        Continue <i class="bi bi-arrow-right" aria-hidden="true"></i>
-      </button>
+      <div class="ds-btn-tooltip-wrap" id="ds-continue-wrap">
+        <button class="ds-booking-btn" id="ds-booking-continue" type="button" disabled>
+          Continue <i class="bi bi-arrow-right" aria-hidden="true"></i>
+        </button>
+      </div>
     </div>
 
   </div>
@@ -151,7 +153,26 @@ bookingPage: true
         send over the invoice. Keep an eye on your inbox.
       </p>
       <div class="ds-booking-confirm-date" id="ds-confirm-date" aria-live="polite"></div>
-      <a href="/" class="ds-cta" style="margin-top:2.5rem;">
+
+      <div class="ds-add-to-cal">
+        <button type="button" class="ds-add-cal-btn" id="ds-ics-btn">
+          <i class="bi bi-calendar-arrow-down" aria-hidden="true"></i>
+          Add to Calendar
+        </button>
+        <a class="ds-add-cal-btn ds-add-cal-google" id="ds-gcal-btn" href="#" target="_blank" rel="noopener noreferrer">
+          <svg width="16" height="16" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="4" y="8" width="40" height="36" rx="3" fill="#fff"/>
+            <rect x="4" y="8" width="40" height="11" rx="3" fill="#1a73e8"/>
+            <rect x="4" y="14" width="40" height="5" fill="#1a73e8"/>
+            <rect x="13" y="2" width="5" height="12" rx="2.5" fill="#ea4335"/>
+            <rect x="30" y="2" width="5" height="12" rx="2.5" fill="#ea4335"/>
+            <text x="24" y="38" font-family="Arial,sans-serif" font-size="15" font-weight="bold" fill="#1a73e8" text-anchor="middle">31</text>
+          </svg>
+          Google Calendar
+        </a>
+      </div>
+
+      <a href="/" class="ds-cta" style="margin-top:1.5rem;">
         Back to home <i class="bi bi-arrow-right" aria-hidden="true" style="font-size:0.75em;"></i>
       </a>
     </div>

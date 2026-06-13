@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const MIN_HOURS = 3;
+  const MIN_HOURS = 2;
 
   // ── Booked dates — loaded from Radicale on init ────────────────────────────
   let remoteBookedDates = [];
@@ -31,8 +31,7 @@
       const data = await res.json();
       if (Array.isArray(data.booked)) remoteBookedDates = data.booked;
     } catch (e) {
-      // If the function is unreachable (e.g. local dev without Netlify CLI),
-      // fall back silently — the calendar just won't show remote bookings.
+      // Falls back silently — calendar won't show remote bookings in local dev without Netlify CLI.
     }
     renderCalendar();
   }
@@ -51,8 +50,24 @@
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
   }
 
+  function durationMins(start, end) {
+    return toMins(end) - toMins(start);
+  }
+
   function durationHours(start, end) {
-    return Math.ceil((toMins(end) - toMins(start)) / 60);
+    return Math.ceil(durationMins(start, end) / 60);
+  }
+
+  function isBelowMin(t) {
+    return state.startTime &&
+      t > state.startTime &&
+      durationMins(state.startTime, t) < MIN_HOURS * 60;
+  }
+
+  function isValidEnd(t) {
+    return state.startTime &&
+      t > state.startTime &&
+      durationMins(state.startTime, t) >= MIN_HOURS * 60;
   }
 
   // ── Time slots: 6 AM to midnight ───────────────────────────────────────────
@@ -211,56 +226,58 @@
     });
   }
 
-  function isValidEnd(t) {
-    return state.startTime && t > state.startTime &&
-      (toMins(t) - toMins(state.startTime)) >= MIN_HOURS * 60;
-  }
-
   function updateSlotClasses() {
+    const endSet  = state.startTime && state.endTime;
+    const isWarn  = endSet && durationMins(state.startTime, state.endTime) < MIN_HOURS * 60;
+
+    $id('ds-tg-wrap').classList.toggle('ds-tg-warn', !!isWarn);
+
     document.querySelectorAll('.ds-tg-slot').forEach(slot => {
       const t = slot.dataset.time;
-      slot.classList.remove('ds-slot-start', 'ds-slot-end', 'ds-slot-range', 'ds-slot-below-min');
+      slot.classList.remove('ds-slot-start', 'ds-slot-end', 'ds-slot-range', 'ds-slot-under-min');
 
       if (t === state.startTime) {
         slot.classList.add('ds-slot-start');
       } else if (t === state.endTime) {
         slot.classList.add('ds-slot-end');
-      } else if (state.startTime && state.endTime && t > state.startTime && t < state.endTime) {
+      } else if (endSet && t > state.startTime && t < state.endTime) {
         slot.classList.add('ds-slot-range');
-      } else if (state.startTime && !state.endTime && t > state.startTime && !isValidEnd(t)) {
-        slot.classList.add('ds-slot-below-min');
+      } else if (state.startTime && !state.endTime && isBelowMin(t)) {
+        slot.classList.add('ds-slot-under-min');
       }
     });
   }
 
   function onSlotHover(t) {
     if (!state.startTime || state.endTime) return;
-    if (!isValidEnd(t)) return; // don't preview the below-min zone
+    if (t <= state.startTime) return;
     clearPreview();
+    const warn = durationMins(state.startTime, t) < MIN_HOURS * 60;
     document.querySelectorAll('.ds-tg-slot').forEach(slot => {
       const st = slot.dataset.time;
-      if (st > state.startTime && st <= t) slot.classList.add('ds-slot-preview');
+      if (st > state.startTime && st <= t) {
+        slot.classList.add(warn ? 'ds-slot-preview-warn' : 'ds-slot-preview');
+      }
     });
   }
 
   function clearPreview() {
-    document.querySelectorAll('.ds-slot-preview').forEach(el => el.classList.remove('ds-slot-preview'));
+    document.querySelectorAll('.ds-slot-preview, .ds-slot-preview-warn')
+      .forEach(el => el.classList.remove('ds-slot-preview', 'ds-slot-preview-warn'));
   }
 
   function onSlotClick(t) {
     if (!state.startTime || state.endTime) {
-      // Fresh start
       state.startTime = t;
       state.endTime   = null;
-    } else if (isValidEnd(t)) {
-      // Valid end time
+    } else if (t > state.startTime) {
       state.endTime = t;
       clearPreview();
       setTimeout(() => {
         $id('ds-booking-continue').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }, 120);
     } else {
-      // Clicked at/before start, or within min window — reset to new start
+      // Clicked at or before start — reset
       state.startTime = t;
       state.endTime   = null;
     }
@@ -271,21 +288,28 @@
 
   function updateInstruction() {
     const el = $id('ds-tg-instruction');
+    el.classList.remove('ds-tg-complete', 'ds-tg-warn-msg');
+
     if (!state.startTime) {
       el.textContent = 'Tap a slot to set arrival time';
-      el.classList.remove('ds-tg-complete');
     } else if (!state.endTime) {
       const earliest = addMins(state.startTime, MIN_HOURS * 60);
       const hasValid  = GRID_SLOTS.some(t => isValidEnd(t));
       if (!hasValid) {
         el.textContent = `${fmt12(state.startTime)} is too late for a ${MIN_HOURS}-hour booking. Please select an earlier arrival.`;
+        el.classList.add('ds-tg-warn-msg');
       } else {
-        el.textContent = `Arrival: ${fmt12(state.startTime)} — tap a finish time (earliest ${fmt12(earliest)})`;
+        el.textContent = `Arrival: ${fmt12(state.startTime)} — tap a finish time (minimum ${fmt12(earliest)})`;
       }
-      el.classList.remove('ds-tg-complete');
     } else {
-      el.textContent = `${fmt12(state.startTime)} to ${fmt12(state.endTime)}`;
-      el.classList.add('ds-tg-complete');
+      const mins = durationMins(state.startTime, state.endTime);
+      if (mins < MIN_HOURS * 60) {
+        el.textContent = `${fmt12(state.startTime)} to ${fmt12(state.endTime)} — minimum booking is ${MIN_HOURS} hours`;
+        el.classList.add('ds-tg-warn-msg');
+      } else {
+        el.textContent = `${fmt12(state.startTime)} to ${fmt12(state.endTime)}`;
+        el.classList.add('ds-tg-complete');
+      }
     }
   }
 
@@ -304,8 +328,18 @@
 
   // ── Continue ───────────────────────────────────────────────────────────────
   function updateContinue() {
-    $id('ds-booking-continue').disabled =
-      !(state.selectedDate && state.startTime && state.endTime);
+    const hasAll   = state.selectedDate && state.startTime && state.endTime;
+    const tooShort = hasAll && durationMins(state.startTime, state.endTime) < MIN_HOURS * 60;
+    const btn      = $id('ds-booking-continue');
+    const wrap     = $id('ds-continue-wrap');
+
+    btn.disabled = !hasAll || tooShort;
+
+    if (tooShort) {
+      wrap.setAttribute('data-tooltip', `Minimum booking is ${MIN_HOURS} hours`);
+    } else {
+      wrap.removeAttribute('data-tooltip');
+    }
   }
 
   // ── Step navigation ────────────────────────────────────────────────────────
@@ -339,6 +373,59 @@
         <span>${fmt12(state.startTime)} to ${fmt12(state.endTime)}</span>
       </div>
     `;
+  }
+
+  // ── Add to Calendar ────────────────────────────────────────────────────────
+  function toICSLocal(dateStr, timeStr) {
+    const d = dateStr.replace(/-/g, '');
+    const t = (timeStr === '24:00' ? '23:59' : timeStr).replace(':', '') + '00';
+    return `${d}T${t}`;
+  }
+
+  function makeICS() {
+    const uid  = `DS-${state.selectedDate.replace(/-/g, '')}-${state.startTime.replace(':', '')}@dreamyshots`;
+    const now  = new Date().toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z';
+    return [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Dreamy Shots//Booking//EN',
+      'CALSCALE:GREGORIAN',
+      'BEGIN:VEVENT',
+      `UID:${uid}`,
+      `DTSTAMP:${now}`,
+      `DTSTART;TZID=Australia/Sydney:${toICSLocal(state.selectedDate, state.startTime)}`,
+      `DTEND;TZID=Australia/Sydney:${toICSLocal(state.selectedDate, state.endTime)}`,
+      'SUMMARY:Dreamy Shots Photography',
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\r\n');
+  }
+
+  function downloadICS() {
+    const blob = new Blob([makeICS()], { type: 'text/calendar' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `dreamy-shots-${state.selectedDate}.ics`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function googleCalUrl() {
+    const start = toICSLocal(state.selectedDate, state.startTime);
+    const end   = toICSLocal(state.selectedDate, state.endTime);
+    const p = new URLSearchParams({
+      action:  'TEMPLATE',
+      text:    'Dreamy Shots Photography',
+      dates:   `${start}/${end}`,
+      details: 'Event photography by Dreamy Shots.',
+    });
+    return `https://calendar.google.com/calendar/render?${p}`;
+  }
+
+  function setupAddToCalendar() {
+    $id('ds-ics-btn').addEventListener('click', downloadICS);
+    $id('ds-gcal-btn').href = googleCalUrl();
   }
 
   // ── Form submit → Radicale ────────────────────────────────────────────────
@@ -385,6 +472,7 @@
       }
 
       saveSessionBooking(state.selectedDate);
+      setupAddToCalendar();
 
       const confirmDate = `${fmtDateLong(state.selectedDate)}, ${fmt12(state.startTime)} to ${fmt12(state.endTime)}`;
       $id('ds-confirm-date').textContent = confirmDate;
