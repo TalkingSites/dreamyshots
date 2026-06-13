@@ -78,21 +78,6 @@ bookingPage: true
     <form class="ds-booking-form" id="ds-booking-form" novalidate>
 
       <div class="ds-form-group">
-        <p class="ds-form-label">Will food and drink be provided? <span class="ds-required-mark" aria-hidden="true">*</span></p>
-        <p class="ds-form-hint">So Wency knows whether to eat beforehand.</p>
-        <div class="ds-toggle-group" role="radiogroup" aria-label="Food and drink provided">
-          <label class="ds-toggle-opt">
-            <input type="radio" name="food" value="yes" required>
-            <span>Yes</span>
-          </label>
-          <label class="ds-toggle-opt">
-            <input type="radio" name="food" value="no">
-            <span>No</span>
-          </label>
-        </div>
-      </div>
-
-      <div class="ds-form-group">
         <label class="ds-form-label" for="b-name">Contact name <span class="ds-required-mark" aria-hidden="true">*</span></label>
         <input class="ds-form-input" type="text" id="b-name" name="name"
                autocomplete="name" required>
@@ -126,6 +111,20 @@ bookingPage: true
         <label class="ds-form-label" for="b-abn">ABN</label>
         <input class="ds-form-input" type="text" id="b-abn" name="abn"
                inputmode="numeric" pattern="[0-9\s]{9,14}">
+      </div>
+
+      <div class="ds-form-group">
+        <p class="ds-form-label">Will food and drink be provided?</p>
+        <div class="ds-toggle-group" role="radiogroup" aria-label="Food and drink provided">
+          <label class="ds-toggle-opt">
+            <input type="radio" name="food" value="yes">
+            <span>Yes</span>
+          </label>
+          <label class="ds-toggle-opt">
+            <input type="radio" name="food" value="no">
+            <span>No</span>
+          </label>
+        </div>
       </div>
 
       <div class="ds-booking-actions">

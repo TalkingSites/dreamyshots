@@ -685,6 +685,40 @@ html[data-bs-theme="light"] .ds-hero::before {
   color:        var(--ds-accent);
 }
 
+.ds-footer-left {
+  display:        flex;
+  flex-direction: column;
+  gap:            0.5rem;
+}
+
+.ds-footer-cc-row {
+  display:     flex;
+  align-items: center;
+  gap:         0.6rem;
+}
+
+.ds-footer-cc {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             0.3rem;
+  color:           var(--ds-text-faint);
+  text-decoration: none;
+  transition:      color 0.2s ease;
+}
+.ds-footer-cc:hover { color: var(--ds-text-muted); }
+
+.ds-footer-github {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             0.4rem;
+  font-size:       0.72rem;
+  color:           var(--ds-text-faint);
+  text-decoration: none;
+  letter-spacing:  0.03em;
+  transition:      color 0.2s ease;
+}
+.ds-footer-github:hover { color: var(--ds-text); }
+
 /* ── Gallery event page ──────────────────────────────────────── */
 .ds-event-page { padding-top: 5rem; flex: 1; }
 
