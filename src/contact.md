@@ -16,9 +16,9 @@ permalink: "/contact/"
 
     <p class="ds-contact-book-note">
       Ready to book?
-      <a href="{{ site.bookingUrl }}" target="_blank" rel="noopener">
+      <a href="/book/">
         Reserve your date directly
-        <i class="bi bi-arrow-up-right" aria-hidden="true" style="font-size:0.75em;"></i>
+        <i class="bi bi-arrow-right" aria-hidden="true" style="font-size:0.75em;"></i>
       </a>
     </p>
 
