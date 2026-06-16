@@ -347,6 +347,7 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+
   // ── Summary ────────────────────────────────────────────────────────────────
   function renderBookingSummary() {
     $id('ds-booking-summary').innerHTML = `
@@ -446,8 +447,8 @@
       });
 
       if (!res.ok) {
-        submitBtn.disabled  = false;
-        submitBtn.textContent = 'Pay by Invoice';
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Book <i class="bi bi-check-lg" aria-hidden="true"></i>';
         alert('Something went wrong. Please try again.');
         return;
       }
@@ -462,8 +463,8 @@
       $id('ds-booking-steps-bar').hidden = true;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
-      submitBtn.disabled    = false;
-      submitBtn.textContent = 'Pay by Invoice';
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = 'Book <i class="bi bi-check-lg" aria-hidden="true"></i>';
       alert('Network error. Please check your connection and try again.');
     }
   }

@@ -139,19 +139,9 @@ bookingPage: true
         <button type="button" class="ds-booking-btn-back" id="ds-booking-back">
           <i class="bi bi-arrow-left" aria-hidden="true"></i> Back
         </button>
-        <div class="ds-payment-btns">
-          <div class="ds-pay-now-wrap">
-            <button type="button" class="ds-booking-btn" disabled aria-disabled="true">
-              Pay Now
-              <i class="bi bi-lock-fill" aria-hidden="true" style="font-size:0.8em;"></i>
-            </button>
-            <span class="ds-coming-soon-badge">Coming Soon</span>
-          </div>
-          <button type="submit" class="ds-booking-btn">
-            Pay by Invoice
-            <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
-          </button>
-        </div>
+        <button type="submit" class="ds-booking-btn" id="ds-book-btn">
+          Book <i class="bi bi-check-lg" aria-hidden="true"></i>
+        </button>
       </div>
 
     </form>
@@ -165,8 +155,7 @@ bookingPage: true
       </div>
       <h2 class="ds-booking-confirm-title">You're booked in.</h2>
       <p class="ds-booking-confirm-msg">
-        Wency will be in touch within 24 hours to confirm the details and
-        send over the invoice. Keep an eye on your inbox.
+        Your booking is confirmed. A 50% deposit invoice will be sent to your email shortly. Keep an eye on your inbox.
       </p>
       <div class="ds-booking-confirm-date" id="ds-confirm-date" aria-live="polite"></div>
 
