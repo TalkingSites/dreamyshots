@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Dreamy Shots | Flyer designs (A4, 2-up A5)</title>
+<style>
+/* ══════════════════════════════════════════════════════════════
+   Dreamy Shots print flyers
+   A4 landscape sheet = two identical A5 portrait flyers, cut down
+   the middle. Paper is left pure white on purpose: no background
+   fills anywhere, so the printer only lays ink where it matters.
+   ══════════════════════════════════════════════════════════════ */
+
+@font-face {
+  font-family: "UbuntuSans";
+  src: url("assets/UbuntuSans-VariableFont_wdth%2Cwght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --ink:        #17120e;
+  --ink-soft:   #574c42;
+  --ink-faint:  #9b8e81;
+  --gold:       #a06c3a;
+  --gold-deep:  #7d4f24;
+  --rule:       rgba(160, 108, 58, 0.38);
+  --rule-faint: rgba(23, 18, 14, 0.14);
+}
+
+* { box-sizing: border-box; }
+
+html { background: #2b2723; }
+
+body {
+  margin: 0;
+  font-family: "UbuntuSans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #e8e2d9;
+}
+
+/* ── Screen chrome (never printed) ───────────────────────────── */
+
+.ui {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: #17140f;
+  border-bottom: 1px solid rgba(200, 147, 90, 0.25);
+  padding: 14px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 26px;
+  align-items: center;
+}
+
+.ui-brand {
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: #c8935a;
+  margin-right: auto;
+}
+.ui-brand small {
+  display: block;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  font-weight: 400;
+  font-size: 11px;
+  color: #8d8177;
+  margin-top: 3px;
+}
+
+.ui-group { display: flex; align-items: center; gap: 8px; }
+.ui-label {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8d8177;
+}
+
+.seg { display: flex; border: 1px solid rgba(200, 147, 90, 0.3); border-radius: 999px; overflow: hidden; }
+.seg button {
+  font: inherit;
+  font-size: 12px;
+  padding: 6px 13px;
+  border: 0;
+  background: transparent;
+  color: #b8ada2;
+  cursor: pointer;
+}
+.seg button + button { border-left: 1px solid rgba(200, 147, 90, 0.22); }
+.seg button[aria-pressed="true"] { background: #c8935a; color: #17140f; font-weight: 600; }
+
+.hint {
+  padding: 12px 20px 0;
+  font-size: 12.5px;
+  color: #9a8f84;
+  max-width: 980px;
+  line-height: 1.6;
+}
+.hint strong { color: #c8935a; font-weight: 600; }
+
+.stage { padding: 22px 20px 70px; display: flex; flex-direction: column; align-items: center; gap: 34px; }
+
+.design { width: 100%; max-width: 1140px; }
+
+.design-bar {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid rgba(200, 147, 90, 0.18);
+}
+.design-num {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: #c8935a;
+  font-weight: 600;
+}
+.design-name { font-size: 16px; font-weight: 600; color: #e8e2d9; }
+.design-note { font-size: 12.5px; color: #8d8177; }
+.ink-badge {
+  margin-left: auto;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8d8177;
+  border: 1px solid rgba(200, 147, 90, 0.3);
+  border-radius: 999px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+.print-btn {
+  font: inherit;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #c8935a;
+  background: transparent;
+  color: #c8935a;
+  cursor: pointer;
+}
+.print-btn:hover { background: #c8935a; color: #17140f; }
+
+/* Scaled preview wrapper: the sheet itself always stays true A4 size */
+.scaler { display: flex; justify-content: center; }
+.scaler-inner { transform-origin: top center; }
+
+/* ── The A4 sheet ────────────────────────────────────────────── */
+
+.sheet {
+  width: 297mm;
+  height: 210mm;
+  background: #fff;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Faint dashed cut guide down the centre. Costs almost no ink. */
+.sheet::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  border-left: 0.3mm dashed rgba(23, 18, 14, 0.22);
+  pointer-events: none;
+}
+
+.flyer {
+  width: 148.5mm;
+  height: 210mm;
+  padding: 12mm 11mm;
+  display: flex;
+  flex-direction: column;
+  color: var(--ink);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Shared flyer pieces ─────────────────────────────────────── */
+
+.mark { display: flex; align-items: center; gap: 3mm; }
+.mark svg { width: 8mm; height: 8mm; color: var(--gold); flex: none; }
+.wordmark {
+  font-size: 5.6mm;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+.wordmark span { color: var(--gold); }
+
+.eyebrow {
+  font-size: 2.7mm;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.rule { height: 0; border-top: 0.35mm solid var(--rule); }
+.rule-faint { height: 0; border-top: 0.25mm solid var(--rule-faint); }
+
+.statement {
+  font-weight: 300;
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+}
+.statement b { font-weight: 600; color: var(--gold-deep); }
+
+.body-copy {
+  font-size: 3.5mm;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.points { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2.2mm; }
+.points li {
+  font-size: 3.3mm;
+  line-height: 1.35;
+  padding-left: 5mm;
+  position: relative;
+  color: var(--ink);
+}
+.points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 1.5mm;
+  width: 2mm;
+  height: 2mm;
+  border: 0.4mm solid var(--gold);
+  border-radius: 50%;
+}
+
+.photo { overflow: hidden; background: #f2efec; }
+.photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.cta-row { display: flex; align-items: flex-end; gap: 5mm; }
+.qr { width: 24mm; height: 24mm; flex: none; }
+.qr img { width: 100%; height: 100%; display: block; }
+.cta-text { flex: 1; min-width: 0; }
+.cta-lead {
+  font-size: 2.7mm;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 1.6mm;
+}
+.url {
+  font-size: 5mm;
+  font-weight: 600;
+  color: var(--gold-deep);
+  letter-spacing: -0.005em;
+  line-height: 1.1;
+  word-break: break-word;
+}
+.url-sub { font-size: 3mm; color: var(--ink-soft); margin-top: 1.4mm; line-height: 1.4; }
+
+.spacer { flex: 1; }
+
+.credit {
+  font-size: 2.5mm;
+  color: var(--ink-faint);
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+}
+
+/* ── Design 1: Editorial ─────────────────────────────────────── */
+.d1 .statement { font-size: 10.4mm; margin: 7mm 0 0; }
+.d1 .strip { height: 46mm; margin: 7mm 0; }
+.d1 .points { margin-top: 5mm; }
+
+/* ── Design 2: Contact sheet ─────────────────────────────────── */
+.d2 .frames { display: flex; gap: 2.4mm; margin: 6mm 0 0; }
+.d2 .frame { flex: 1; }
+.d2 .frame .photo { height: 50mm; }
+.d2 .frame-no {
+  font-size: 2.3mm;
+  letter-spacing: 0.16em;
+  color: var(--ink-faint);
+  margin-top: 1.3mm;
+  display: flex;
+  gap: 1.8mm;
+}
+.d2 .frame-no b { color: var(--gold); font-weight: 600; }
+.d2 .sprockets {
+  display: flex;
+  gap: 2.1mm;
+  margin-top: 3mm;
+}
+.d2 .sprockets i {
+  flex: 1;
+  height: 1.6mm;
+  border: 0.3mm solid var(--rule-faint);
+  border-radius: 0.4mm;
+}
+.d2 .statement { font-size: 8.8mm; margin: 7mm 0 0; }
+.d2 .points { margin-top: 5mm; }
+
+/* ── Design 3: Portrait led ──────────────────────────────────── */
+.d3 .statement { font-size: 8.6mm; margin: 6mm 0 0; }
+.d3 .split { display: flex; gap: 6mm; margin-top: 7mm; align-items: stretch; }
+/* 52 x 69mm is almost exactly the portrait's own 3:4, so it crops barely at all */
+.d3 .portrait { width: 52mm; height: 69mm; flex: none; }
+.d3 .quote-col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.d3 .quote {
+  font-size: 3.5mm;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  border-left: 0.5mm solid var(--rule);
+  padding-left: 4mm;
+  margin: 0;
+}
+.d3 .sig {
+  font-size: 3mm;
+  color: var(--gold-deep);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 3mm;
+  padding-left: 4mm;
+}
+.d3 .points { margin-top: 6mm; }
+
+/* ── Design 4: Poster ────────────────────────────────────────── */
+.d4 .statement { font-size: 15.5mm; margin: 0; }
+.d4 .support { font-size: 3.4mm; line-height: 1.5; color: var(--ink-soft); margin: 6mm 0 0; }
+.d4 .kicker {
+  font-size: 3.2mm;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-top: 6mm;
+}
+.d4 .chip-row { display: flex; flex-wrap: wrap; gap: 2mm; margin-top: 5mm; }
+.d4 .chip {
+  font-size: 2.9mm;
+  letter-spacing: 0.06em;
+  border: 0.3mm solid var(--rule);
+  border-radius: 999px;
+  padding: 1.4mm 3.4mm;
+  color: var(--ink-soft);
+}
+.d4 .tile { width: 34mm; height: 34mm; }
+.d4 .bottom { display: flex; align-items: flex-end; gap: 5mm; }
+
+/* ── Ink modes (apply on screen and in print) ────────────────── */
+body.ink-light .photo img,
+body.ink-light .portrait-col img { filter: brightness(1.14) contrast(0.9) saturate(0.88); }
+body.ink-mono .photo img,
+body.ink-mono .portrait-col img { filter: grayscale(1) brightness(1.12) contrast(0.9); }
+
+/* ── Print ───────────────────────────────────────────────────── */
+@page { size: A4 landscape; margin: 0; }
+
+@media print {
+  html { background: #fff; }
+  body { margin: 0; }
+  .ui, .hint, .design-bar { display: none !important; }
+  .stage { padding: 0; gap: 0; display: block; }
+  .design { max-width: none; }
+  .scaler, .scaler-inner { display: block; transform: none !important; }
+
+  /* "one" is set only by a per-design Print button, and cleared afterwards */
+  body[data-print="one"] .design:not(.is-selected) { display: none !important; }
+  body[data-print="one"] .design.is-selected .sheet {
+    page-break-after: auto;
+    break-after: auto;
+  }
+
+  .sheet {
+    page-break-after: always;
+    break-after: page;
+    box-shadow: none;
+  }
+  .design:last-child .sheet { page-break-after: auto; break-after: auto; }
+
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body data-print="all">
+
+<div class="ui">
+  <div class="ui-brand">
+    Dreamy Shots flyers
+    <small>A4 landscape sheet, two identical A5 flyers, cut down the dashed line</small>
+  </div>
+
+  <div class="ui-group">
+    <span class="ui-label">View</span>
+    <div class="seg" id="view-seg">
+      <button data-view="fit" aria-pressed="true">Fit sheet</button>
+      <button data-view="full" aria-pressed="false">Actual size</button>
+    </div>
+  </div>
+
+  <div class="ui-group">
+    <button class="print-btn" id="print-all">Print all four</button>
+  </div>
+
+  <div class="ui-group">
+    <span class="ui-label">Ink</span>
+    <div class="seg" id="ink-seg">
+      <button data-ink="normal" aria-pressed="true">Normal</button>
+      <button data-ink="light" aria-pressed="false">Light</button>
+      <button data-ink="mono" aria-pressed="false">Mono</button>
+    </div>
+  </div>
+</div>
+
+<p class="hint">
+  Each sheet below is one <strong>A4 landscape</strong> page holding <strong>two identical A5 flyers</strong>.
+  Print it, cut down the dashed centre line, and you have two. Print from this page with
+  <strong>Scale 100%</strong> and <strong>Margins: None</strong>, or save as PDF first.
+  Backgrounds are pure white everywhere, so ink only goes where the photos and type are.
+  <strong>Light</strong> and <strong>Mono</strong> above lay down noticeably less ink again.
+</p>
+
+<div class="stage" id="stage"></div>
+
+<template id="tpl-svg-mark">
+  <svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true">
+    <path d="M37.625 50C37.625 43.1649 47.2899 37.625 54.125 37.625V33.5C49.7489 33.5 45.5521 35.2384 42.4577 38.3327C39.3634 41.4271 37.625 45.6239 37.625 50Z"/>
+    <path d="M67.8117 29.375H76.1236C79.9186 29.375 83 32.4523 83 36.2514V63.7486C83 67.5436 79.9228 70.625 76.1236 70.625H67.8117C63.7577 73.323 58.9948 74.7585 54.125 74.75C49.2552 74.7585 44.4923 73.323 40.4383 70.625H23.8764C20.0814 70.625 17 67.5478 17 63.7486V36.2514C17 32.4564 20.0773 29.375 23.8764 29.375H25.25C25.25 28.281 25.6846 27.2318 26.4582 26.4582C27.2318 25.6846 28.281 25.25 29.375 25.25H33.5C34.594 25.25 35.6432 25.6846 36.4168 26.4582C37.1904 27.2318 37.625 28.281 37.625 29.375H40.4383C44.4923 26.677 49.2552 25.2415 54.125 25.25C59.1864 25.25 63.8889 26.768 67.8117 29.375ZM25.25 35.5625C25.25 35.0155 25.0327 34.4909 24.6459 34.1041C24.2591 33.7173 23.7345 33.5 23.1875 33.5C22.6405 33.5 22.1159 33.7173 21.7291 34.1041C21.3423 34.4909 21.125 35.0155 21.125 35.5625C21.125 36.1095 21.3423 36.6341 21.7291 37.0209C22.1159 37.4077 22.6405 37.625 23.1875 37.625C23.7345 37.625 24.2591 37.4077 24.6459 37.0209C25.0327 36.6341 25.25 36.1095 25.25 35.5625ZM74.75 50C74.75 44.5299 72.577 39.2839 68.7091 35.4159C64.8411 31.548 59.5951 29.375 54.125 29.375C48.6549 29.375 43.4089 31.548 39.5409 35.4159C35.673 39.2839 33.5 44.5299 33.5 50C33.5 55.4701 35.673 60.7161 39.5409 64.5841C43.4089 68.452 48.6549 70.625 54.125 70.625C59.5951 70.625 64.8411 68.452 68.7091 64.5841C72.577 60.7161 74.75 55.4701 74.75 50Z"/>
+  </svg>
+</template>
+
+<script>
+(function () {
+  "use strict";
+
+  var IMG = "assets/";
+  var QR  = "assets/qr.png";
+  var PORTRAIT = "assets/wency.webp";
+
+  var mark = document.getElementById("tpl-svg-mark").innerHTML;
+
+  function brand(extraClass) {
+    return '<div class="mark ' + (extraClass || '') + '">' + mark +
+      '<div class="wordmark">Dreamy <span>Shots</span></div></div>';
+  }
+
+  function qrBlock(lead, sub, cls) {
+    return '' +
+      '<div class="cta-row ' + (cls || '') + '">' +
+        '<div class="qr"><img src="' + QR + '" alt="QR code to shots.dreamy.org"/></div>' +
+        '<div class="cta-text">' +
+          '<div class="cta-lead">' + lead + '</div>' +
+          '<div class="url">shots.dreamy.org</div>' +
+          '<div class="url-sub">' + sub + '</div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  /* ── The four flyer designs ────────────────────────────────── */
+
+  var designs = [
+    {
+      id: "editorial",
+      name: "Editorial",
+      note: "Type first, one wide photo, plenty of paper left alone.",
+      ink: "Ink: low",
+      html: function () {
+        return '' +
+          '<div class="flyer d1">' +
+            brand() +
+            '<div class="rule" style="margin-top:5mm"></div>' +
+            '<h1 class="statement">Events captured<br/>the way they <b>felt</b>.</h1>' +
+            '<div class="photo strip"><img src="' + IMG + 'french-icc-immersion-16.webp" alt=""/></div>' +
+            '<p class="body-copy">' +
+              'Event photography for meetups, user groups, panels, workshops and the ' +
+              'gatherings that deserve better than a handful of phone photos.' +
+            '</p>' +
+            '<ul class="points">' +
+              '<li>Candid coverage, not stiff lineups</li>' +
+              '<li>Available light, minimal setup, nobody performing for the camera</li>' +
+              '<li>A full gallery you can download and share with everyone who came</li>' +
+            '</ul>' +
+            '<div class="spacer"></div>' +
+            '<div class="rule-faint" style="margin-bottom:6mm"></div>' +
+            qrBlock("Scan to see recent shoots", "See the portfolio, or start a conversation before you book.") +
+          '</div>';
+      }
+    },
+
+    {
+      id: "contact-sheet",
+      name: "Contact sheet",
+      note: "Three frames in a strip, like a proof sheet. Shows range fast.",
+      ink: "Ink: low to medium",
+      html: function () {
+        function frame(file, no, label) {
+          return '' +
+            '<div class="frame">' +
+              '<div class="photo"><img src="' + IMG + file + '" alt=""/></div>' +
+              '<div class="frame-no"><b>' + no + '</b><span>' + label + '</span></div>' +
+            '</div>';
+        }
+        return '' +
+          '<div class="flyer d2">' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;gap:4mm">' +
+              brand() +
+              '<div class="eyebrow">Event photography</div>' +
+            '</div>' +
+            '<div class="rule" style="margin-top:5mm"></div>' +
+            '<div class="frames">' +
+              frame("french-icc-immersion-04.webp", "01", "arrivals") +
+              frame("french-icc-immersion-23.webp", "02", "the talk") +
+              frame("french-icc-immersion-16.webp", "03", "after") +
+            '</div>' +
+            '<div class="sprockets"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>' +
+            '<h1 class="statement">The whole night,<br/>not just the <b>speeches</b>.</h1>' +
+            '<p class="body-copy" style="margin-top:5mm">' +
+              'Meetups, user groups, panels, workshops, community and corporate gatherings, ' +
+              'photographed as they actually happen: from the first hellos to the last ' +
+              'conversation nobody wants to end.' +
+            '</p>' +
+            '<ul class="points">' +
+              '<li>Candid coverage, not stiff lineups</li>' +
+              '<li>Available light, minimal setup, nobody performing for the camera</li>' +
+              '<li>A full gallery you can download and share with everyone who came</li>' +
+            '</ul>' +
+            '<div class="spacer"></div>' +
+            '<div class="rule-faint" style="margin-bottom:6mm"></div>' +
+            qrBlock("Scan for the full galleries", "Recent shoot: French ICC Immersion, hosted at inspire9.") +
+          '</div>';
+      }
+    },
+
+    {
+      id: "portrait",
+      name: "Portrait",
+      note: "Puts a face and a camera on the flyer. Warmest of the four.",
+      ink: "Ink: medium",
+      html: function () {
+        return '' +
+          '<div class="flyer d3">' +
+            brand() +
+            '<div class="rule" style="margin-top:5mm"></div>' +
+            '<h1 class="statement">Events captured<br/>the way they <b>felt</b>.</h1>' +
+            '<div class="split">' +
+              '<div class="photo portrait">' +
+                '<img src="' + PORTRAIT + '" alt="Wency of Dreamy Shots, camera raised"/>' +
+              '</div>' +
+              '<div class="quote-col">' +
+                '<blockquote class="quote">' +
+                  '\u201cEvery gathering deserves to be captured the way it felt to be there. ' +
+                  'The soft light between speeches, the laughter off to the side, the moment ' +
+                  'someone didn\u2019t know they were being watched.\u201d' +
+                '</blockquote>' +
+                '<div class="sig">Wency, Dreamy Shots</div>' +
+              '</div>' +
+            '</div>' +
+            '<ul class="points">' +
+              '<li>Meetups, panels, workshops, team gatherings</li>' +
+              '<li>Candid by default, quiet on the floor</li>' +
+              '<li>A gallery you can download and share</li>' +
+            '</ul>' +
+            '<div class="spacer"></div>' +
+            '<div class="rule-faint" style="margin-bottom:6mm"></div>' +
+            qrBlock("Scan to see the work", "Questions before you book? There is a form on the site.") +
+          '</div>';
+      }
+    },
+
+    {
+      id: "poster",
+      name: "Poster",
+      note: "Almost pure type. Reads across a room, uses the least ink.",
+      ink: "Ink: very low",
+      html: function () {
+        return '' +
+          '<div class="flyer d4">' +
+            brand() +
+            '<div class="rule" style="margin:5mm 0 12mm"></div>' +
+            '<h1 class="statement">Events<br/>captured<br/>the way<br/>they <b>felt</b>.</h1>' +
+            '<div class="kicker">Event photography</div>' +
+            '<div class="chip-row">' +
+              '<span class="chip">Meetups</span>' +
+              '<span class="chip">User groups</span>' +
+              '<span class="chip">Panels</span>' +
+              '<span class="chip">Workshops</span>' +
+              '<span class="chip">Team gatherings</span>' +
+            '</div>' +
+            '<p class="support">' +
+              'Photographed as it happens, in the light the room already has. ' +
+              'You get a full gallery to download and share with everyone who came.' +
+            '</p>' +
+            '<div class="spacer"></div>' +
+            '<div class="rule-faint" style="margin-bottom:7mm"></div>' +
+            '<div class="bottom">' +
+              '<div class="photo tile"><img src="' + IMG + 'french-icc-immersion-29.webp" alt=""/></div>' +
+              '<div class="cta-text">' +
+                '<div class="cta-lead">Scan, or type it in</div>' +
+                '<div class="url">shots.dreamy.org</div>' +
+                '<div class="url-sub">Portfolio, and a form if you want to talk it through first.</div>' +
+              '</div>' +
+              '<div class="qr" style="width:26mm;height:26mm"><img src="' + QR + '" alt="QR code to shots.dreamy.org"/></div>' +
+            '</div>' +
+          '</div>';
+      }
+    }
+  ];
+
+  /* ── Render ────────────────────────────────────────────────── */
+
+  var stage = document.getElementById("stage");
+
+  designs.forEach(function (d, i) {
+    var wrap = document.createElement("section");
+    wrap.className = "design";
+    wrap.id = "design-" + d.id;
+
+    var num = String(i + 1).padStart(2, "0");
+    var flyer = d.html();
+
+    wrap.innerHTML = '' +
+      '<div class="design-bar">' +
+        '<span class="design-num">' + num + '</span>' +
+        '<span class="design-name">' + d.name + '</span>' +
+        '<span class="design-note">' + d.note + '</span>' +
+        '<span class="ink-badge">' + d.ink + '</span>' +
+        '<button class="print-btn" data-print-design="' + d.id + '">Print this one</button>' +
+      '</div>' +
+      '<div class="scaler"><div class="scaler-inner">' +
+        '<div class="sheet">' + flyer + flyer + '</div>' +
+      '</div></div>';
+
+    stage.appendChild(wrap);
+  });
+
+  /* ── Fit-to-width scaling for the previews ─────────────────── */
+
+  var MM = 96 / 25.4;                  // CSS px per mm
+  var SHEET_W = 297 * MM;
+  var SHEET_H = 210 * MM;
+  var view = "fit";
+
+  function layout() {
+    var avail = Math.min(stage.clientWidth - 40, 1140);
+    var scale = view === "fit" ? Math.min(1, avail / SHEET_W) : 1;
+
+    document.querySelectorAll(".design").forEach(function (d) {
+      var inner = d.querySelector(".scaler-inner");
+      inner.style.transform = "scale(" + scale + ")";
+      // Reserve the visual height the scaled sheet actually occupies
+      inner.parentNode.style.height = (SHEET_H * scale) + "px";
+      inner.parentNode.style.overflow = view === "fit" ? "visible" : "auto";
+    });
+  }
+
+  window.addEventListener("resize", layout);
+
+  /* ── Controls ──────────────────────────────────────────────── */
+
+  function wireSeg(id, onPick) {
+    var seg = document.getElementById(id);
+    seg.addEventListener("click", function (e) {
+      var btn = e.target.closest("button");
+      if (!btn) return;
+      seg.querySelectorAll("button").forEach(function (b) {
+        b.setAttribute("aria-pressed", String(b === btn));
+      });
+      onPick(btn);
+    });
+  }
+
+  wireSeg("view-seg", function (btn) {
+    view = btn.dataset.view;
+    layout();
+  });
+
+  wireSeg("ink-seg", function (btn) {
+    document.body.classList.remove("ink-light", "ink-mono");
+    if (btn.dataset.ink !== "normal") {
+      document.body.classList.add("ink-" + btn.dataset.ink);
+    }
+  });
+
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-print-design]");
+    if (!btn) return;
+    var id = btn.dataset.printDesign;
+    document.querySelectorAll(".design").forEach(function (d) {
+      d.classList.toggle("is-selected", d.id === "design-" + id);
+    });
+    document.body.dataset.print = "one";
+    window.print();
+  });
+
+  document.getElementById("print-all").addEventListener("click", function () {
+    document.body.dataset.print = "all";
+    window.print();
+  });
+
+  // Never leave the page in single-sheet mode, or a later Ctrl+P prints blanks
+  window.addEventListener("afterprint", function () {
+    document.body.dataset.print = "all";
+    document.querySelectorAll(".design").forEach(function (d) {
+      d.classList.remove("is-selected");
+    });
+  });
+
+  // Wait for the webfont so the preview measures with the real type
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(layout);
+  }
+  layout();
+})();
+</script>
+
+</body>
+</html>
